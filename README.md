@@ -25,17 +25,17 @@ STM32 UART is configured for `115200 8-N-1`.
 The physical connector count is declared in `src/main.cpp`:
 
 ```cpp
-#define NUM_CONNECTOR 4
+#define NUM_CONNECTOR 8
 ```
 
-The current firmware has four physical connectors, with IDs `1` to `4`.
+The current firmware has eight physical connectors, with IDs `1` to `8`.
 
 MicroOcpp also reserves connector ID `0` for the charge point, so
 `MO_NUMCONNECTORS` in `platformio.ini` must be the physical connector count
 plus one:
 
 ```ini
--DMO_NUMCONNECTORS=5
+-DMO_NUMCONNECTORS=9
 ```
 
 For a different number of physical connectors, update both values:
@@ -125,8 +125,8 @@ release `RESET/EN`, then release `BOOT` and run the upload command again.
 
 - Relay is enabled only when the connector status is `Charging`.
 - Relay is disabled for other connector states.
-- Meter values are read from STM32: voltage, current, power and energy.
-- `meterStart` and `meterStop` use the real STM32 energy register.
+- Voltage, current and power values are read from STM32.
+- `Energy.Active.Import.Register`, `meterStart` and `meterStop` report a fixed `1000 Wh` (1 kWh).
 - A transaction stops when power remains below `20 W` for `60 seconds`.
 - A transaction also stops when current reaches `9000 mA`.
 - All relays are initialized OFF at startup.

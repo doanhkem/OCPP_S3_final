@@ -22,7 +22,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
-#define NUM_CONNECTOR 4 ///
+#define NUM_CONNECTOR 8 ///
 #define MAX_TIME_TRY 50  // 20
 #define HIGH_LIMIT_POWER 2000
 #define HIGH_LIMIT_AMPE 9000
@@ -30,6 +30,7 @@
 #define LOW_LIMIT_POWER_TIME_TRY 10//25
 #define LOW_POWER_STOP_THRESHOLD 20
 #define LOW_POWER_STOP_TIME_MS 60000UL
+#define FIXED_METER_ENERGY_WH 1000
 
 #define START_OF_MESSAGE 0xA5
 #define MAX_ATTEMPTS 5
@@ -751,7 +752,9 @@ public:
                                 PowerService::PowerInfo power = PowerService::getPowerInfo(item.channel, item.messageId,
                                                                                            powerChannel[id]);
                                 updateMeterError(id, item.channel);
-                                return Helper::castType<int32_t>(power.energy);
+                                // Keep P/U/I from STM32 while reporting a fixed 1 kWh energy value.
+                                (void) power;
+                                return FIXED_METER_ENERGY_WH;
                             }));
 
             addMeterValueInput(std::move(sampler), id);

@@ -47,6 +47,7 @@ def main():
 #define HIGH_LIMIT_AMPE 9
 #define LOW_LIMIT_POWER 10
 #define LOW_LIMIT_POWER_TIME_TRY 25
+#define FIXED_METER_ENERGY_WH 1000
 #define START_OF_MESSAGE 0xA5
 #define MAX_ATTEMPTS 5
 #define READ_DELAY 200
@@ -301,20 +302,11 @@ public:
                                 }}
                                 delay(100);
 
-                                // ---- TEMPORARY HARDCODE ----------------------------------
-                                // StartTransaction.meterStart is forced to 0 Wh and
-                                // StopTransaction.meterStop is forced to 1000 Wh.
-                                // Periodic MeterValues are untouched and keep reporting the
-                                // real energy register. Delete the two lines below to
-                                // restore the real values.
-                                if (ctx == ReadingContext_TransactionBegin) return 0;     // HARDCODE meterStart = 0 Wh
-                                if (ctx == ReadingContext_TransactionEnd)   return 1000;  // HARDCODE meterStop = 1000 Wh
-                                // ---- END TEMPORARY HARDCODE ------------------------------
-
                                 auto [channel, messageID] = ItemPower::getInfo(id);
                                 PowerService::PowerInfo power = PowerService::getPowerInfo(channel, messageID,
                                                                                            powerChannel[id]);
-                                return Helper::castType<int32_t>(power.energy);
+                                // Keep P/U/I from STM32 while reporting a fixed 1 kWh energy value.
+                                return FIXED_METER_ENERGY_WH;
                             }}));
 
             addMeterValueInput(std::move(sampler), id);
